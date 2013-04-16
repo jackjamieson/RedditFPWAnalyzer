@@ -1,5 +1,10 @@
-import java.io.IOException;
+//Written by Jack Jamieson
+//Reddit Front Page Word Analyzer
+//Runs the program.
+//Dependencies: jsoup, apache commons net, apache commons io.
+//https://twitter.com/jamieson_jack
 
+import java.io.IOException;
 
 public class driver {
 

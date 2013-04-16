@@ -12,7 +12,6 @@ $array = preg_split("/\r\n|\n|\r/", $text);#split by new line and put into an ar
 natsort($array);#perform a natural sort.
 $newarr = array_reverse($array, true);#descending order.
 $newarr = array_slice($newarr, 0, 25);#top 25.
-
 $comma = implode("\n", $newarr);#seperate the array back into new lines.
 
 echo '<pre>'; print_r($comma); echo '</pre>'

@@ -61,7 +61,9 @@ Timer timer;
 	public void scrape() throws IOException{
 
 		//Using the RSS feed was easier because there is less formatting to sort through.
-		Document site = Jsoup.connect("http://www.reddit.com/.rss").get();//Using Jsoup to connect to and parse Reddit's RSS feed.
+		Document site = Jsoup.connect("http://www.reddit.com/.rss")
+				.userAgent("Reddit Front Page Word Analyzer/Trending FP Words on Reddit by worldbit v0.1")
+				.get();//Using Jsoup to connect to and parse Reddit's RSS feed.
 	
 		Elements titles = site.select("title");//Create a list of elements that use the title tag.  Title defines the names of the posts.
 		

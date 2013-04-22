@@ -8,11 +8,11 @@ http://www.tcnj.edu/~jamiesj1/rwa/
 A Reddit front page scraper that finds trending words from the top 25 posts (not user specific).
 
 ###LOOKING TO IMPLEMENT:
-- [ ] Longest words.
+- [x] Longest words.
 - [ ] Persistant data - keep the old data when the program is restarted.
 - [ ] Display data graphically.
 - [ ] Scrape specific subreddits.
-- [ ] Search for specific words and display their position in the trending list.
+- [x] Search for specific words and display their position in the trending list.
 - [ ] Better list of rejected words  - a lot still missing.
 
 ###KNOWN BUGS:

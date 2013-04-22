@@ -2,7 +2,7 @@
 Written by Jack Jamieson
 https://twitter.com/jamieson_jack
 
-Reddit Front Page Word Analyzer - posts.php
+Reddit Front Page Word Analyzer - longest.php
 Displays the top 25 words from the raw text file.
 
 //    This file is part of RedditFPWAnalyzer.

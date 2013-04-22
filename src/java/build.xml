@@ -1,0 +1,37 @@
+<project name="RedditFPWAnalyzer" default="run">
+	<target name="compile"> 
+		
+		<javac srcdir="." includeantruntime="false"/>
+	</target>
+
+	<target name="clean"> 
+		<delete>
+			<fileset dir="." includes="*.class"/>
+			<fileset dir="." includes="*.txt"/>
+		
+		</delete>
+		
+		<delete dir="META-INF"/>
+	</target> 
+	
+	<target name="run" depends="compile, who">
+		<echo message="Started scraping at "/>
+		 <tstamp>  
+          <format property="TODAY_US" pattern="MM/dd/yyyy hh:mm aa" locale="en,US"/>  
+        </tstamp>  
+   
+        <echo>${TODAY_US}</echo> 
+		<java classname="driver" classpath="." fork="true">
+		</java>
+		
+	</target>
+	
+	<target name="who">
+	
+		<echo message="================================"/>
+		<echo message="Reddit Front Page Word Analyzer"/>
+		<echo message="================================"/>
+		<echo message="Written by Jack Jamieson @ TCNJ"/>
+	</target>
+
+</project>

@@ -2,6 +2,7 @@
 //Reddit Front Page Word Analyzer
 //Does all of the backend work.
 //Dependencies: jsoup, apache commons net, apache commons io.
+//v0.1
 //https://twitter.com/jamieson_jack
 
 //    This file is part of RedditFPWAnalyzer.
@@ -150,7 +151,7 @@ Timer timer;
 					|| FPwordsArr[start].equals("for") || FPwordsArr[start].equals("we") || FPwordsArr[start].equals("them") || FPwordsArr[start].equals("she") || FPwordsArr[start].equals("he") || FPwordsArr[start].equals("have") || FPwordsArr[start].equals("had") || FPwordsArr[start].equals("-")|| FPwordsArr[start].equals("us")
 					|| FPwordsArr[start].equals("you're") || FPwordsArr[start].equals("your") || FPwordsArr[start].equals("you've") || FPwordsArr[start].equals("by") || FPwordsArr[start].equals("are") || FPwordsArr[start].equals("were") || FPwordsArr[start].equals("|") || FPwordsArr[start].equals("how") || FPwordsArr[start].equals("its")
 					|| FPwordsArr[start].equals("it's") || FPwordsArr[start].equals("has") || FPwordsArr[start].equals("can") || FPwordsArr[start].equals("how") || FPwordsArr[start].equals("his") || FPwordsArr[start].equals("hers") || FPwordsArr[start].equals("be") || FPwordsArr[start].equals("who") || FPwordsArr[start].equals("whom") || FPwordsArr[start].equals("which")
-					|| FPwordsArr[start].equals("they") || FPwordsArr[start].equals("when"))
+					|| FPwordsArr[start].equals("they") || FPwordsArr[start].equals("when") || FPwordsArr[start].equals("not")|| FPwordsArr[start].equals("would") || FPwordsArr[start].equals("such") || FPwordsArr[start].equals("like") || FPwordsArr[start].equals("than") || FPwordsArr[start].equals("but") || FPwordsArr[start].equals("her") || FPwordsArr[start].equals("he"))
 			{
 			}
 			else
@@ -188,7 +189,7 @@ Timer timer;
 					|| FPwordsArr[write].equals("for") || FPwordsArr[write].equals("we") || FPwordsArr[write].equals("them") || FPwordsArr[write].equals("she") || FPwordsArr[write].equals("he") || FPwordsArr[write].equals("have") || FPwordsArr[write].equals("had") || FPwordsArr[write].equals("-") || FPwordsArr[write].equals("us")
 					|| FPwordsArr[write].equals("you're") || FPwordsArr[write].equals("your") || FPwordsArr[write].equals("you've") || FPwordsArr[write].equals("by") || FPwordsArr[write].equals("are") || FPwordsArr[write].equals("were") || FPwordsArr[write].equals("|") || FPwordsArr[write].equals("how") || FPwordsArr[write].equals("its")
 					|| FPwordsArr[write].equals("it's") || FPwordsArr[write].equals("has") || FPwordsArr[write].equals("can") || FPwordsArr[write].equals("how") || FPwordsArr[write].equals("his") || FPwordsArr[write].equals("hers") || FPwordsArr[write].equals("be") || FPwordsArr[write].equals("who") || FPwordsArr[write].equals("whom") || FPwordsArr[write].equals("which")
-					|| FPwordsArr[write].equals("they") || FPwordsArr[write].equals("when"))
+					|| FPwordsArr[write].equals("they") || FPwordsArr[write].equals("when")|| FPwordsArr[write].equals("not")|| FPwordsArr[write].equals("would") || FPwordsArr[write].equals("such") || FPwordsArr[write].equals("like") || FPwordsArr[write].equals("than") || FPwordsArr[write].equals("but") || FPwordsArr[write].equals("her") || FPwordsArr[write].equals("he"))
 					{
 					
 					}
@@ -275,6 +276,8 @@ Timer timer;
 		FileWriter fw = new FileWriter("matchedPosts.txt");
 		BufferedWriter bw = new BufferedWriter(fw);
 		
+		Object exact[] = FPmatched.clone();
+		
 		for(int writePosts = 0; writePosts < FPmatched.length; writePosts++)
 		{
 			if(FPmatched[writePosts].equals(""))//Don't write if the post is blank.
@@ -282,8 +285,10 @@ Timer timer;
 			}
 			else
 			{
+				
+				FPmatched[writePosts] = FPmatched[writePosts].toString().replaceAll("\"", "");
 				//Output the string with html in it.  PHP will read this and use it to create the links on the page.
-				bw.write("<a href=\"http://www.reddit.com/search?q=" + FPmatched[writePosts].toString() + "\">" + FPmatched[writePosts].toString() + "</a>");
+				bw.write("<a href=\"http://www.reddit.com/search?q=" + FPmatched[writePosts].toString() + "\">" + exact[writePosts].toString() + "</a>");
 				bw.newLine();
 			}
 		}

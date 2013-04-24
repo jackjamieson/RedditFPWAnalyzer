@@ -13,7 +13,7 @@ A Reddit front page scraper that finds trending words from the top 25 posts (not
 - [ ] Display data graphically.
 - [ ] Scrape specific subreddits.
 - [x] Search for specific words and display their position in the trending list.
-- [ ] Better list of rejected words  - a lot still missing.
+- [x] Better list of rejected words  - a lot still missing.
 
 ###KNOWN BUGS:
 - [x] Posts titles with quotes in them are not properly searched for. Should be a simple fix.

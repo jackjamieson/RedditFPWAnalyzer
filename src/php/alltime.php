@@ -2,7 +2,7 @@
 Written by Jack Jamieson
 https://twitter.com/jamieson_jack
 
-Reddit Front Page Word Analyzer - process.php
+Reddit Front Page Word Analyzer - alltime.php
 Displays the top 25 words from the raw text file.
 
 //    This file is part of RedditFPWAnalyzer.
@@ -21,44 +21,13 @@ Displays the top 25 words from the raw text file.
 //    along with RedditFPWAnalyzer.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <?php
-$text = file_get_contents('http://www.tcnj.edu/~jamiesj1/rwa/ALLFrontPagedWords.txt');
-$array = preg_split("/\r\n|\n|\r/", $text);
+$text = file_get_contents('http://www.tcnj.edu/~jamiesj1/rwa/AllTimeFPWords.txt');
 
-$searchthis = $_GET['title'];#Data from the index page.
-
-$matches = array();
-$ignore = "Seen";
-
-$handle = @fopen("http://www.tcnj.edu/~jamiesj1/rwa/ALLFrontPagedWords.txt", "r");#Open the file, read-only.
-if ($handle)
-{
-    while (!feof($handle))
-    {
-        $buffer = fgets($handle);
-        if(strpos($buffer, $searchthis) !== FALSE)
-			if($searchthis == $ignore)#Don't allow users to type Seen...it's part of all strings.
-			{
-				echo("Invalid word.");
-				break;
-			}
-			else{
-				$matches[] = $buffer;
-				}
-    }
-    fclose($handle);
-}
-natsort($matches);#Show the highest at the top.
-$matches = array_reverse($matches, false);#descending order.
-if(empty($matches))
-{
-	echo '<pre>'."No matches found.".'</pre>';
-}
-
-$newarr = array_slice($matches, 0, 5);#show only 5 results.
+$array = preg_split("/\r\n|\n|\r/", $text);#split by new line and put into an array.
+natsort($array);#perform a natural sort.
+$newarr = array_reverse($array, true);#descending order.
+$newarr = array_slice($newarr, 0, 25);#top 25.
 $comma = implode("\n", $newarr);#seperate the array back into new lines.
 
 echo '<pre>'; print_r($comma); echo '</pre>'
 ?>
-
-
-

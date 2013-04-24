@@ -2,7 +2,7 @@
 //Reddit Front Page Word Analyzer
 //Does all of the backend work.
 //Dependencies: jsoup, apache commons net, apache commons io.
-//v0.1
+//v0.2
 //https://twitter.com/jamieson_jack
 
 //    This file is part of RedditFPWAnalyzer.
@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
+//import java.util.Arrays; You would need this if you wanted the array to be sorted.
 import java.util.Scanner;
 import java.util.LinkedList;
 import java.util.Timer;
@@ -47,6 +47,10 @@ LinkedList<Object> FPwords = new LinkedList<Object>();//Contains all words to hi
 LinkedList<Object> matchingPosts = new LinkedList<Object>();//Contains all CURRENT matching posts.
 Timer timer;
 
+Object[] FPwordsArrAllTime;//All time array.
+//STOP WORDS! Thanks to www.textfixer.com.  Added a few of my own though.
+String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't","all","almost","also","am","among","an","and","any","are","aren't","as","at","be","because","been","but","by","can","can't","cannot","could","could've","couldn't","dear","did","didn't","do","does","doesn't","don't","either","else","ever","every","for","from","get","got","had","has","hasn't","have","he","he'd","he'll","he's","her","hers","him","his","how","how'd","how'll","how's","however","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","just","least","let","like","likely","may","me","might","might've","mightn't","most","must","must've","mustn't","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","shan't","she","she'd","she'll","she's","should","should've","shouldn't","since","so","some","than","that","that'll","that's","the","their","them","then","there","there's","these","they","they'd","they'll","they're","they've","this","tis","to","too","twas","us","wants","was","wasn't","we","we'd","we'll","we're","were","weren't","what","what'd","what's","when","when","when'd","when'll","when's","where","where'd","where'll","where's","which","while","who","who'd","who'll","who's","whom","why","why'd","why'll","why's","will","with","won't","would","would've","wouldn't","yet","you","you'd","you'll","you're","you've","your", "", "up", "very", "-", "each", "came", "even", "new", "=", "do's", "don'ts", "its", "isnt", "now"};
+
 	public void execute() throws IOException
 	{
 		scrape();
@@ -63,7 +67,7 @@ Timer timer;
 
 		//Using the RSS feed was easier because there is less formatting to sort through.
 		Document site = Jsoup.connect("http://www.reddit.com/.rss")
-				.userAgent("Reddit Front Page Word Analyzer/Trending FP Words on Reddit by worldbit v0.1")
+				.userAgent("Reddit Front Page Word Analyzer/Trending FP Words on Reddit by worldbit v0.2")
 				.get();//Using Jsoup to connect to and parse Reddit's RSS feed.
 	
 		Elements titles = site.select("title");//Create a list of elements that use the title tag.  Title defines the names of the posts.
@@ -90,8 +94,7 @@ Timer timer;
 			postnum++;
 		}
 		
-		FPposts[0] = "";//There is an empty space here...this is redundant? 
-		//TODO: Look into this [0].
+		FPposts[0] = "";//The 0th space is empty because of the way it is parsed.
 		
 		while(ReadWords.hasNext())//Making a linked list of words.  There is a variable amount (it keeps growing).
 		{		
@@ -104,8 +107,9 @@ Timer timer;
 		
 		//TODO: This probably could be done without this, but that's how I did it originally.  Maybe change this later?
 		FPwordsArr = FPwords.toArray();//Convert the list to an array.
-
-		Arrays.sort(FPwordsArr);//Perform initial lexicographic sort.
+		FPwordsArrAllTime = FPwords.toArray();//Add the same words to the all time array.
+		//Arrays.sort(FPwordsArr);//Perform initial lexicographic sort.  This is optional, sort lexicographic or not.
+		//TODO: Doesn't actually need to be sorted, can be changed if performance suffers.
 	}
 	
 	//Outputs the posts on the front page to a text file - will be uploaded later.
@@ -127,11 +131,16 @@ Timer timer;
 	//TODO: Find a way to keep the data and use it again so it's not overwritten when restarting.
 	public void outputWords() throws IOException
 	{
+
 		int count = 0;
+		int countAll = 0;
 		String temp = "";//Compared to string to remove duplicates in the output.
+		String temp2 = "";
 		File afpw = new File("ALLFrontPagedWords.txt");
 		
-		//This might still be useful? Download the file if it's been longer than a certain time...I'll leave it, might be useful.
+		//This might still be useful? Download the file if it's been longer than a certain time...
+		//I'll leave it, might be useful.
+		
 //		if(FileUtils.isFileNewer(afpw, 600000))
 //		{
 //			URL rwa = new URL("http://www.tcnj.edu/~jamiesj1/rwa/ALLFrontPagedWords.txt");
@@ -145,17 +154,7 @@ Timer timer;
 		//String filter when adding initial words.
 		for(int start = 0; start < FPwordsArr.length; start++)
 		{
-			if(FPwordsArr[start].toString().equals("to") || FPwordsArr[start].toString().equals("a") || FPwordsArr[start].equals("the") || FPwordsArr[start].equals("a") || FPwordsArr[start].equals("") || FPwordsArr[start].equals("with") || FPwordsArr[start].equals("in") || FPwordsArr[start].equals("from") || 
-					FPwordsArr[start].equals("this") || FPwordsArr[start].equals("that") || FPwordsArr[start].equals("and") || FPwordsArr[start].equals("of") || FPwordsArr[start].equals("on") || FPwordsArr[start].equals("is") || FPwordsArr[start].equals("i") || FPwordsArr[start].equals("my") || FPwordsArr[start].equals("it")
-					|| FPwordsArr[start].equals("as") || FPwordsArr[start].equals("an") || FPwordsArr[start].equals("so") || FPwordsArr[start].equals("you") || FPwordsArr[start].equals("my") || FPwordsArr[start].equals("me") || FPwordsArr[start].equals("what") || FPwordsArr[start].equals("was") || FPwordsArr[start].equals("at")
-					|| FPwordsArr[start].equals("for") || FPwordsArr[start].equals("we") || FPwordsArr[start].equals("them") || FPwordsArr[start].equals("she") || FPwordsArr[start].equals("he") || FPwordsArr[start].equals("have") || FPwordsArr[start].equals("had") || FPwordsArr[start].equals("-")|| FPwordsArr[start].equals("us")
-					|| FPwordsArr[start].equals("you're") || FPwordsArr[start].equals("your") || FPwordsArr[start].equals("you've") || FPwordsArr[start].equals("by") || FPwordsArr[start].equals("are") || FPwordsArr[start].equals("were") || FPwordsArr[start].equals("|") || FPwordsArr[start].equals("how") || FPwordsArr[start].equals("its")
-					|| FPwordsArr[start].equals("it's") || FPwordsArr[start].equals("has") || FPwordsArr[start].equals("can") || FPwordsArr[start].equals("how") || FPwordsArr[start].equals("his") || FPwordsArr[start].equals("hers") || FPwordsArr[start].equals("be") || FPwordsArr[start].equals("who") || FPwordsArr[start].equals("whom") || FPwordsArr[start].equals("which")
-					|| FPwordsArr[start].equals("they") || FPwordsArr[start].equals("when") || FPwordsArr[start].equals("not")|| FPwordsArr[start].equals("would") || FPwordsArr[start].equals("such") || FPwordsArr[start].equals("like") || FPwordsArr[start].equals("than") || FPwordsArr[start].equals("but") || FPwordsArr[start].equals("her") || FPwordsArr[start].equals("he"))
-			{
-			}
-			else
-			{//Removes duplicate words in the array.
+				//Removes duplicate words in the array.
 				for(int rest = start;rest < FPwordsArr.length; rest++)
 					if(FPwordsArr[start].toString().equals(FPwordsArr[rest].toString()))
 					{
@@ -166,41 +165,120 @@ Timer timer;
 						
 						temp = FPwordsArr[start].toString();
 
-					}//Removes  empty words and spaces.
+					}
+				//Removes  empty words and spaces.
 				if(FPwordsArr[start].equals(""))
 				{
 				}
 				else//Append "Seen # 'word'".
 				{
-					FPwordsArr[start] = "Seen " + count + " " + FPwordsArr[start].toString();
-				
+					FPwordsArr[start] = FPwordsArr[start].toString().replaceAll("[^A-Za-z0-9'\\/\\- ]", "");//Remove non-alphanumeric characters.
+						if(findStopWords(FPwordsArr[start].toString(),stopWords))//Filter for stop words as of v0.2
+						{
+							
+						}
+						else
+						{
+							if(count > 500)//Reset trending at 500.
+								count = 1;
+							
+							FPwordsArr[start] = "Seen " + count + " " + FPwordsArr[start].toString();
+							
+
+						}
 				}
 				
 				count = 0;
-			}
-	
 		}	
+		
 		//String filter when writing to file.  Need both because the first one is add filter, this is write filter.
 		for(int write = 0; write < FPwordsArr.length; write++)
 		{
-			if(FPwordsArr[write].toString().equals("to") || FPwordsArr[write].toString().equals("a") || FPwordsArr[write].equals("the") || FPwordsArr[write].equals("a") || FPwordsArr[write].equals("") || FPwordsArr[write].equals("with") || FPwordsArr[write].equals("in") || FPwordsArr[write].equals("from") || 
-					FPwordsArr[write].equals("this") || FPwordsArr[write].equals("that") || FPwordsArr[write].equals("and") || FPwordsArr[write].equals("of") || FPwordsArr[write].equals("on") || FPwordsArr[write].equals("is") || FPwordsArr[write].equals("i") || FPwordsArr[write].equals("my") || FPwordsArr[write].equals("it")
-					|| FPwordsArr[write].equals("as") || FPwordsArr[write].equals("an") || FPwordsArr[write].equals("so") || FPwordsArr[write].equals("you") || FPwordsArr[write].equals("my") || FPwordsArr[write].equals("me") || FPwordsArr[write].equals("what") || FPwordsArr[write].equals("was") || FPwordsArr[write].equals("at")
-					|| FPwordsArr[write].equals("for") || FPwordsArr[write].equals("we") || FPwordsArr[write].equals("them") || FPwordsArr[write].equals("she") || FPwordsArr[write].equals("he") || FPwordsArr[write].equals("have") || FPwordsArr[write].equals("had") || FPwordsArr[write].equals("-") || FPwordsArr[write].equals("us")
-					|| FPwordsArr[write].equals("you're") || FPwordsArr[write].equals("your") || FPwordsArr[write].equals("you've") || FPwordsArr[write].equals("by") || FPwordsArr[write].equals("are") || FPwordsArr[write].equals("were") || FPwordsArr[write].equals("|") || FPwordsArr[write].equals("how") || FPwordsArr[write].equals("its")
-					|| FPwordsArr[write].equals("it's") || FPwordsArr[write].equals("has") || FPwordsArr[write].equals("can") || FPwordsArr[write].equals("how") || FPwordsArr[write].equals("his") || FPwordsArr[write].equals("hers") || FPwordsArr[write].equals("be") || FPwordsArr[write].equals("who") || FPwordsArr[write].equals("whom") || FPwordsArr[write].equals("which")
-					|| FPwordsArr[write].equals("they") || FPwordsArr[write].equals("when")|| FPwordsArr[write].equals("not")|| FPwordsArr[write].equals("would") || FPwordsArr[write].equals("such") || FPwordsArr[write].equals("like") || FPwordsArr[write].equals("than") || FPwordsArr[write].equals("but") || FPwordsArr[write].equals("her") || FPwordsArr[write].equals("he"))
-					{
-					
-					}
-					else{
-						bw.append(FPwordsArr[write].toString());
-						bw.newLine();
-					}
+
+			if(findStopWords(FPwordsArr[write].toString(), stopWords))//Filter for stop words.
+			{
+				
 			}
+			else
+			{
+				FPwordsArr[write] = FPwordsArr[write].toString().replaceAll("[^A-Za-z0-9'\\/\\- ]", "");
+				bw.append(FPwordsArr[write].toString());
+				bw.newLine();
+				
+			}
+		}
 
 		bw.flush();
 		bw.close();	
+		
+		
+		
+		////////////////
+		//TRENDING ABOVE
+		/////////////////////////////////////////////////////////////////
+		//ALL TIME BELOW
+		////////////////
+		
+		
+		
+		for(int start = 0; start < FPwordsArrAllTime.length; start++)
+		{
+				//Removes duplicate words in the array.
+				for(int rest = start;rest < FPwordsArrAllTime.length; rest++)
+					if(FPwordsArrAllTime[start].toString().equals(FPwordsArrAllTime[rest].toString()))
+					{
+						countAll++;
+
+						if(temp2.equals(FPwordsArrAllTime[rest]))
+							FPwordsArrAllTime[rest] = "";	
+						
+						temp2 = FPwordsArrAllTime[start].toString();
+
+					}
+				//Removes  empty words and spaces.
+				if(FPwordsArrAllTime[start].equals(""))
+				{
+				}
+				else//Append "Seen # 'word'".
+				{
+					FPwordsArrAllTime[start] = FPwordsArrAllTime[start].toString().replaceAll("[^A-Za-z0-9'\\/\\- ]", "");//Remove non-alphanumeric characters.
+						if(findStopWords(FPwordsArrAllTime[start].toString(),stopWords))//Filter for stop words as of v0.2
+						{
+							
+						}
+						else
+						{					
+							FPwordsArrAllTime[start] = "Seen " + countAll + " " + FPwordsArrAllTime[start].toString();
+							
+						}
+				}
+				
+				countAll = 0;
+	
+		}	
+		//Writing the all time words to a file:
+		File alltimewords = new File("AllTimeFPWords.txt");
+		FileWriter fw2 = new FileWriter(alltimewords);
+		BufferedWriter bw2 = new BufferedWriter(fw2);
+		
+		for(int write = 0; write < FPwordsArrAllTime.length; write++)
+		{
+
+			if(findStopWords(FPwordsArrAllTime[write].toString(), stopWords))//Filter for stop words.
+			{
+				
+			}
+			else
+			{
+				FPwordsArrAllTime[write] = FPwordsArrAllTime[write].toString().replaceAll("[^A-Za-z0-9'\\/\\- ]", "");
+				bw2.append(FPwordsArrAllTime[write].toString());
+				bw2.newLine();
+				
+			}
+		}
+
+		bw2.flush();
+		bw2.close();	
 	}
 	
 	//Matches the posts on the CURRENT front page with the overall(since program started) top words.
@@ -288,7 +366,7 @@ Timer timer;
 				
 				FPmatched[writePosts] = FPmatched[writePosts].toString().replaceAll("\"", "");
 				//Output the string with html in it.  PHP will read this and use it to create the links on the page.
-				bw.write("<a href=\"http://www.reddit.com/search?q=" + FPmatched[writePosts].toString() + "\">" + exact[writePosts].toString() + "</a>");
+				bw.write("<a href=\"http://www.reddit.com/search?q=" + FPmatched[writePosts].toString() + "\" target=\"_blank\">" + exact[writePosts].toString() + "</a>");
 				bw.newLine();
 			}
 		}
@@ -296,6 +374,7 @@ Timer timer;
 		bw.flush();
 		bw.close();
 	}
+	
 
 	//A necessary method to override when using a TimerTask.  Tells what to do when the timer is finished.
 	@Override
@@ -310,6 +389,7 @@ Timer timer;
 		}
 	}
 	
+	
 	//Control the time interval to collect data.
 	public void schedule(long delay, long interval)
 	{
@@ -318,22 +398,27 @@ Timer timer;
 		timer.scheduleAtFixedRate(t, delay, interval);//In milliseconds, 120000 is 2 minute delay, 300000 is 5 minute intervals.
 	}
 	
+	
 	//Upload the files through FTP to be read in PHP and displayed.
 	public void upload(String server, String username, String password)
 	{
 		FTPClient ftp = new FTPClient();
 		FileInputStream fis = null;
 		FileInputStream fis2 = null;
+		FileInputStream fis3 = null;
+		
 		try{
 			//Connect using supplied info.
 			ftp.connect(server);
 			ftp.login(username, password);
 			fis = new FileInputStream("ALLFrontPagedWords.txt");//Read this file.
 			fis2 = new FileInputStream("matchedPosts.txt");//Read this file.
+			fis3 = new FileInputStream("AllTimeFPWords.txt");
 			
 			ftp.changeWorkingDirectory("www/rwa");//This is the directory I change to.
 			ftp.storeFile("ALLFrontPagedWords.txt", fis);//Upload.
 			ftp.storeFile("matchedPosts.txt", fis2);//Upload.
+			ftp.storeFile("AllTimeFPWords.txt", fis3);//Upload.
 			ftp.logout();//IMPORTANT!
 		}
 		
@@ -353,5 +438,19 @@ Timer timer;
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static boolean findStopWords(String input, String[] list)
+	{
+	    for(int word = 0; word < list.length; word++)
+	    {
+	        if(input.equals(list[word]))
+	        {   
+	        	//System.out.println(input);
+	            return true;
+	
+	        }
+	    }
+	    return false;
 	}
 }

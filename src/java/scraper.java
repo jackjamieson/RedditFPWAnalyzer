@@ -38,7 +38,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import java.util.Date;
 
-public class scraper
+public class scraper{
 	
 String FPposts[] = new String[26];//25 posts on the current front page.  There is an extra array location because [0] contains nothing.
 Object[] FPwordsArr;//The array created from FPwords.

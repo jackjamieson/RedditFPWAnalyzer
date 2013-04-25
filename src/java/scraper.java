@@ -2,7 +2,7 @@
 //Reddit Front Page Word Analyzer
 //Does all of the backend work.
 //Dependencies: jsoup, apache commons net, apache commons io.
-//v0.2
+//v0.2.1
 //https://twitter.com/jamieson_jack
 
 //    This file is part of RedditFPWAnalyzer.
@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-//import java.util.Arrays; You would need this if you wanted the array to be sorted.
+//import java.util.Arrays;
 import java.util.Scanner;
 import java.util.LinkedList;
 import java.util.Timer;
@@ -36,29 +36,37 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.net.ftp.FTPClient;
+import java.util.Date;
 
-//To use the timer the class must extend TimerTask.
-public class scraper extends TimerTask{
+public class scraper
 	
 String FPposts[] = new String[26];//25 posts on the current front page.  There is an extra array location because [0] contains nothing.
 Object[] FPwordsArr;//The array created from FPwords.
+//LinkedList<Object> FPwordsArrAllTime = new LinkedList<Object>();//Keep track of all time most popular words.
 Object[] FPmatched;//The array created from matchingPosts.
 LinkedList<Object> FPwords = new LinkedList<Object>();//Contains all words to hit the front page.
 LinkedList<Object> matchingPosts = new LinkedList<Object>();//Contains all CURRENT matching posts.
-Timer timer;
 
-Object[] FPwordsArrAllTime;//All time array.
-//STOP WORDS! Thanks to www.textfixer.com.  Added a few of my own though.
+Object[] FPwordsArrAllTime;
+//STOP WORDS! Thanks to www.textfixer.com
 String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't","all","almost","also","am","among","an","and","any","are","aren't","as","at","be","because","been","but","by","can","can't","cannot","could","could've","couldn't","dear","did","didn't","do","does","doesn't","don't","either","else","ever","every","for","from","get","got","had","has","hasn't","have","he","he'd","he'll","he's","her","hers","him","his","how","how'd","how'll","how's","however","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","just","least","let","like","likely","may","me","might","might've","mightn't","most","must","must've","mustn't","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","shan't","she","she'd","she'll","she's","should","should've","shouldn't","since","so","some","than","that","that'll","that's","the","their","them","then","there","there's","these","they","they'd","they'll","they're","they've","this","tis","to","too","twas","us","wants","was","wasn't","we","we'd","we'll","we're","were","weren't","what","what'd","what's","when","when","when'd","when'll","when's","where","where'd","where'll","where's","which","while","who","who'd","who'll","who's","whom","why","why'd","why'll","why's","will","with","won't","would","would've","wouldn't","yet","you","you'd","you'll","you're","you've","your", "", "up", "very", "-", "each", "came", "even", "new", "=", "do's", "don'ts", "its", "isnt", "now"};
 
-	public void execute() throws IOException
+	public void execute() throws IOException, InterruptedException
 	{
-		scrape();
-		outputFront();
-		outputWords();
-		matchPosts();
-		upload("your server", "username", "password");
-		schedule(120000, 300000);//Example time limits.  This will run every 7 minutes. 2 minute delay, 5 minute interval.
+		//long startTime = System.currentTimeMillis();
+		//long elapsed = 0;
+		int run = 0;//Run infinite.
+		while(run == 0)
+		{
+			scrape();
+			outputFront();
+			outputWords();
+			matchPosts();
+			upload("your server", "username", "password");
+			Thread.sleep(120000);//Amount of time between scrapes - currently running every 2 minutes.
+			//elapsed = (new Date()).getTime() - startTime;
+		}
+		//schedule(0, 120000);//Example time limits.  This will run every 7 minutes. 2 minute delay, 5 minute interval.
 	}
 
 	//Performs the initial parse and normalizes the data.
@@ -67,7 +75,7 @@ String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't"
 
 		//Using the RSS feed was easier because there is less formatting to sort through.
 		Document site = Jsoup.connect("http://www.reddit.com/.rss")
-				.userAgent("Reddit Front Page Word Analyzer/Trending FP Words on Reddit by worldbit v0.2")
+				.userAgent("Reddit Front Page Word Analyzer/Trending FP Words on Reddit by worldbit v0.2.1")
 				.get();//Using Jsoup to connect to and parse Reddit's RSS feed.
 	
 		Elements titles = site.select("title");//Create a list of elements that use the title tag.  Title defines the names of the posts.
@@ -107,8 +115,8 @@ String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't"
 		
 		//TODO: This probably could be done without this, but that's how I did it originally.  Maybe change this later?
 		FPwordsArr = FPwords.toArray();//Convert the list to an array.
-		FPwordsArrAllTime = FPwords.toArray();//Add the same words to the all time array.
-		//Arrays.sort(FPwordsArr);//Perform initial lexicographic sort.  This is optional, sort lexicographic or not.
+		FPwordsArrAllTime = FPwords.toArray();
+		//Arrays.sort(FPwordsArr);//Perform initial lexicographic sort. 
 		//TODO: Doesn't actually need to be sorted, can be changed if performance suffers.
 	}
 	
@@ -179,34 +187,43 @@ String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't"
 						}
 						else
 						{
-							if(count > 500)//Reset trending at 500.
+							//if(count < 500)
+								//countAll = count;
+							//else countAll += count;
+							
+							//FPwordsArrAllTime[start] = "Seen " + countAll + " " + FPwordsArr[start].toString();
+							if(count > 150)//Reset trending at 100.
 								count = 1;
 							
 							FPwordsArr[start] = "Seen " + count + " " + FPwordsArr[start].toString();
 							
 
 						}
+					
+				
 				}
 				
 				count = 0;
+			//}
+	
 		}	
 		
 		//String filter when writing to file.  Need both because the first one is add filter, this is write filter.
 		for(int write = 0; write < FPwordsArr.length; write++)
 		{
 
-			if(findStopWords(FPwordsArr[write].toString(), stopWords))//Filter for stop words.
-			{
-				
+							if(findStopWords(FPwordsArr[write].toString(), stopWords))//Filter for stop words.
+							{
+								
+							}
+							else
+							{
+								FPwordsArr[write] = FPwordsArr[write].toString().replaceAll("[^A-Za-z0-9'\\/\\- ]", "");
+								bw.append(FPwordsArr[write].toString());
+								bw.newLine();
+								
+							}
 			}
-			else
-			{
-				FPwordsArr[write] = FPwordsArr[write].toString().replaceAll("[^A-Za-z0-9'\\/\\- ]", "");
-				bw.append(FPwordsArr[write].toString());
-				bw.newLine();
-				
-			}
-		}
 
 		bw.flush();
 		bw.close();	
@@ -247,13 +264,24 @@ String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't"
 							
 						}
 						else
-						{					
+						{
+							//if(count < 500)
+								//countAll = count;
+							//else countAll += count;
+							
 							FPwordsArrAllTime[start] = "Seen " + countAll + " " + FPwordsArrAllTime[start].toString();
 							
+							//FPwordsArr[start] = "Seen " + count + " " + FPwordsArr[start].toString();
+							
+							//if(count > 500)//Reset trending at 500.
+								//count = 1;
 						}
+					
+				
 				}
 				
 				countAll = 0;
+			//}
 	
 		}	
 		//Writing the all time words to a file:
@@ -264,18 +292,18 @@ String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't"
 		for(int write = 0; write < FPwordsArrAllTime.length; write++)
 		{
 
-			if(findStopWords(FPwordsArrAllTime[write].toString(), stopWords))//Filter for stop words.
-			{
-				
+							if(findStopWords(FPwordsArrAllTime[write].toString(), stopWords))//Filter for stop words.
+							{
+								
+							}
+							else
+							{
+								FPwordsArrAllTime[write] = FPwordsArrAllTime[write].toString().replaceAll("[^A-Za-z0-9'\\/\\- ]", "");
+								bw2.append(FPwordsArrAllTime[write].toString());
+								bw2.newLine();
+								
+							}
 			}
-			else
-			{
-				FPwordsArrAllTime[write] = FPwordsArrAllTime[write].toString().replaceAll("[^A-Za-z0-9'\\/\\- ]", "");
-				bw2.append(FPwordsArrAllTime[write].toString());
-				bw2.newLine();
-				
-			}
-		}
 
 		bw2.flush();
 		bw2.close();	
@@ -375,30 +403,6 @@ String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't"
 		bw.close();
 	}
 	
-
-	//A necessary method to override when using a TimerTask.  Tells what to do when the timer is finished.
-	@Override
-	public void run()
-	{
-		try {
-			execute();
-			timer.cancel();//Cancel the thread after it is done. VERY IMPORTANT! You will run out of memory if this is not done.
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("ERROR: Failed to execute the timer or internet connection lost.\n Will attempt to reconnect at the specified time interval.");
-		}
-	}
-	
-	
-	//Control the time interval to collect data.
-	public void schedule(long delay, long interval)
-	{
-		timer = new Timer();
-		TimerTask t = new scraper();
-		timer.scheduleAtFixedRate(t, delay, interval);//In milliseconds, 120000 is 2 minute delay, 300000 is 5 minute intervals.
-	}
-	
-	
 	//Upload the files through FTP to be read in PHP and displayed.
 	public void upload(String server, String username, String password)
 	{
@@ -440,6 +444,7 @@ String stopWords[] = {"'tis","'twas","a","able","about","across","after","ain't"
 		}
 	}
 	
+	//Method to find stop words.
 	public static boolean findStopWords(String input, String[] list)
 	{
 	    for(int word = 0; word < list.length; word++)

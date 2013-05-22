@@ -18,4 +18,4 @@ A Reddit front page scraper that finds trending words from the top 25 posts (not
 ###KNOWN BUGS:
 - [x] Posts titles with quotes in them are not properly searched for. Should be a simple fix.
 - [ ] Data is lost between restarts.
-
+- [ ] MEMORY LEAK? Hits 100% CPU and crashes after so many hours.
